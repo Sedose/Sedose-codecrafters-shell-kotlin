@@ -7,7 +7,5 @@ import org.springframework.shell.standard.ShellMethod
 class EchoBuiltin {
 
     @ShellMethod(key = ["echo"], value = "Echo the given arguments")
-    fun echo(vararg words: String): String =
-        words.joinToString(" ")
+    fun echo(line: String): String = line
 }
-
