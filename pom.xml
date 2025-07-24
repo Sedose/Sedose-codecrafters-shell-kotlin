@@ -68,7 +68,6 @@
     </dependencyManagement>
 
     <build>
-        <finalName>build-your-own-shell</finalName>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
 <!--        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>-->
         <plugins>
