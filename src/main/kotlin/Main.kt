@@ -1,6 +1,4 @@
 fun main() {
-    // Uncomment this block to pass the first stage
-    // print("$ ")
-
+     print("$ ")
     readln() // Wait for user input
 }
