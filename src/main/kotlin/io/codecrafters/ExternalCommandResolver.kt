@@ -15,8 +15,6 @@ class ExternalCommandResolver : CommandResolver {
     )
 
     override fun resolve(): List<CommandRegistration> {
-        val builtInCommands = setOf("echo", "exit", "type")
-
         return System
             .getenv("PATH")
             .orEmpty()
