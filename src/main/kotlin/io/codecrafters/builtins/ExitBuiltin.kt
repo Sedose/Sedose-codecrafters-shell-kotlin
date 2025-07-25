@@ -3,15 +3,15 @@ package io.codecrafters.builtins
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
-import org.springframework.shell.standard.commands.Quit
-import kotlin.system.exitProcess
+import org.springframework.shell.ExitRequest
 
 @ShellComponent
-class ExitBuiltin : Quit.Command {
+class ExitBuiltin {
+
     @ShellMethod(key = ["exit", "quit"], value = "Terminate the shell process")
     fun exit(
         @ShellOption(defaultValue = "0") exitCode: Int,
-    ) {
-        exitProcess(exitCode)
+    ): Nothing {
+        throw ExitRequest(exitCode)
     }
 }
