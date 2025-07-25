@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "▶ Running ktlint format..."
+./mvnw ktlint:format
+
+FORMAT_STATUS=$?
+if [ $FORMAT_STATUS -ne 0 ]; then
+  echo "✘ ktlint format failed. Aborting commit."
+  exit 1
+fi
+
+echo "✔ Format OK. Running tests..."
