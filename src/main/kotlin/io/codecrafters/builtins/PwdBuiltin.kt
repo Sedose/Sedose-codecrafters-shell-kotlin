@@ -5,7 +5,6 @@ import org.springframework.shell.standard.ShellMethod
 
 @ShellComponent
 class PwdBuiltin {
-
     @ShellMethod(key = ["pwd"], value = "Print working directory")
     fun pwd(): String = System.getProperty("user.dir")
 }

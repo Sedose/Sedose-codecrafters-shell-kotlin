@@ -6,6 +6,15 @@ import org.springframework.shell.standard.ShellMethod
 import org.springframework.stereotype.Component
 import java.lang.reflect.Method
 
+/**
+ * Discovers all shell built-in commands by scanning for @ShellComponent + @ShellMethod at startup.
+ *
+ * This replaces a hardcoded list like:
+ * `val builtInCommands = setOf("echo", "exit", "type", "pwd")`
+ *
+ * Now, whenever one adds a new built-in command, it’s automatically included
+ * in the `commands` set without needing to update constants manually resulting in maintainability that scales naturally with the codebase.
+ */
 @Component
 class BuiltinCommandRegistry(applicationContext: ApplicationContext) {
 

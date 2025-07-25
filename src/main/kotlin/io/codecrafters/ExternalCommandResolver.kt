@@ -9,15 +9,15 @@ import java.io.File
 
 @Component
 class ExternalCommandResolver(
-    private val builtinCommandRegistry: BuiltinCommandRegistry
+    private val builtinCommandRegistry: BuiltinCommandRegistry,
 ) : CommandResolver {
     private data class ExternalExecutable(
         val name: String,
         val path: String,
     )
 
-    override fun resolve(): List<CommandRegistration> {
-        return System
+    override fun resolve(): List<CommandRegistration> =
+        System
             .getenv("PATH")
             .orEmpty()
             .split(':')
@@ -31,7 +31,6 @@ class ExternalCommandResolver(
             .filterNot { it.name in builtinCommandRegistry.commands }
             .map(::toCommandRegistration)
             .toList()
-    }
 
     private fun toCommandRegistration(executable: ExternalExecutable): CommandRegistration =
         CommandRegistration

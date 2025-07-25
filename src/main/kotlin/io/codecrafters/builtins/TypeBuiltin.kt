@@ -1,7 +1,7 @@
 package io.codecrafters.builtins
 
-import org.springframework.context.annotation.Lazy
 import io.codecrafters.BuiltinCommandRegistry
+import org.springframework.context.annotation.Lazy
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import java.io.File
@@ -10,7 +10,6 @@ import java.io.File
 class TypeBuiltin(
     @Lazy private val builtinCommandRegistry: BuiltinCommandRegistry,
 ) {
-
     @ShellMethod("type")
     fun type(command: String): String {
         val executablePath = findExecutableInPath(command)
