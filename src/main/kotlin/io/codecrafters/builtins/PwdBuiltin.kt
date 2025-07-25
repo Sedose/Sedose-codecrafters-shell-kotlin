@@ -1,4 +1,3 @@
-// PwdBuiltin.kt
 package io.codecrafters.builtins
 
 import org.springframework.shell.standard.ShellComponent

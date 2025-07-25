@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component
 import java.io.File
 
 @Component
-class ExternalCommandResolver : CommandResolver {
+class ExternalCommandResolver(
+    private val builtinCommandRegistry: BuiltinCommandRegistry
+) : CommandResolver {
     private data class ExternalExecutable(
         val name: String,
         val path: String,
@@ -26,7 +28,7 @@ class ExternalCommandResolver : CommandResolver {
             .filter { it.canExecute() }
             .map { file -> ExternalExecutable(name = file.name, path = file.absolutePath) }
             .distinctBy(ExternalExecutable::name)
-            .filterNot { it.name in builtInCommands }
+            .filterNot { it.name in builtinCommandRegistry.commands }
             .map(::toCommandRegistration)
             .toList()
     }
