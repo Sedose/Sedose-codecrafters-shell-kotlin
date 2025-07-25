@@ -1,24 +1,24 @@
 package io.codecrafters
 
-import org.springframework.shell.command.CommandRegistration
-import org.springframework.shell.command.CommandResolver
 import org.springframework.shell.Availability
 import org.springframework.shell.command.CommandContext
+import org.springframework.shell.command.CommandRegistration
+import org.springframework.shell.command.CommandResolver
 import org.springframework.stereotype.Component
 import java.io.File
 
 @Component
 class ExternalCommandResolver : CommandResolver {
-
     private data class ExternalExecutable(
         val name: String,
-        val path: String
+        val path: String,
     )
 
     override fun resolve(): List<CommandRegistration> {
         val builtInCommands = setOf("echo", "exit", "type")
 
-        return System.getenv("PATH")
+        return System
+            .getenv("PATH")
             .orEmpty()
             .split(':')
             .asSequence()
@@ -33,8 +33,9 @@ class ExternalCommandResolver : CommandResolver {
             .toList()
     }
 
-    private fun toCommandRegistration(executable: ExternalExecutable): CommandRegistration {
-        return CommandRegistration.builder()
+    private fun toCommandRegistration(executable: ExternalExecutable): CommandRegistration =
+        CommandRegistration
+            .builder()
             .command(executable.name)
             .description("external executable ${executable.path}")
             .availability { Availability.available() }
@@ -42,9 +43,11 @@ class ExternalCommandResolver : CommandResolver {
             .consumer { ctx -> executeExternal(ctx, executable) }
             .and()
             .build()
-    }
 
-    private fun executeExternal(ctx: CommandContext, executable: ExternalExecutable) {
+    private fun executeExternal(
+        ctx: CommandContext,
+        executable: ExternalExecutable,
+    ) {
         val args = ctx.rawArgs.drop(1)
         ProcessBuilder(listOf(executable.name) + args)
             .inheritIO()

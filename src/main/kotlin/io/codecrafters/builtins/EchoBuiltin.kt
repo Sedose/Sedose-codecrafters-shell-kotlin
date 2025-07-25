@@ -6,8 +6,8 @@ import org.springframework.shell.standard.ShellOption
 
 @ShellComponent
 class EchoBuiltin {
-
     @ShellMethod(key = ["echo"], value = "Echo the given arguments")
-    fun echo(@ShellOption(arity = Int.MAX_VALUE) words: Array<String>): String =
-        words.joinToString(" ")
+    fun echo(
+        @ShellOption(arity = Int.MAX_VALUE) words: Array<String>,
+    ): String = words.joinToString(" ")
 }

@@ -7,6 +7,5 @@ import org.springframework.stereotype.Component
 
 @Component
 class DollarPromptProvider : PromptProvider {
-    override fun getPrompt(): AttributedString =
-        AttributedString("$ ", AttributedStyle.DEFAULT)
+    override fun getPrompt(): AttributedString = AttributedString("$ ", AttributedStyle.DEFAULT)
 }

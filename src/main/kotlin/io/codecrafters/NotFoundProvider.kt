@@ -5,7 +5,5 @@ import org.springframework.stereotype.Component
 
 @Component
 class NotFoundProvider : CommandNotFoundMessageProvider {
-    override fun apply(context: CommandNotFoundMessageProvider.ProviderContext): String {
-        return "${context.text()}: command not found"
-    }
+    override fun apply(context: CommandNotFoundMessageProvider.ProviderContext): String = "${context.text()}: command not found"
 }
