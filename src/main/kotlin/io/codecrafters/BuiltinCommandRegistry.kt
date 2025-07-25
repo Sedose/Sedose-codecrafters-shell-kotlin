@@ -16,8 +16,9 @@ import java.lang.reflect.Method
  * in the `commands` set without needing to update constants manually resulting in maintainability that scales naturally with the codebase.
  */
 @Component
-class BuiltinCommandRegistry(applicationContext: ApplicationContext) {
-
+class BuiltinCommandRegistry(
+    applicationContext: ApplicationContext,
+) {
     val commands: Set<String> =
         applicationContext
             .shellComponentBeans()
