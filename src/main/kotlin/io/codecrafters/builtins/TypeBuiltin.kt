@@ -27,7 +27,7 @@ private fun findExecutableInPath(command: String): String? =
         .orEmpty()
         .split(':')
         .asSequence()
-        .map(::File) // each element is a directory
-        .map { dir -> dir.resolve(command) } // directory/command
+        .map(::File)
+        .map { dir -> dir.resolve(command) }
         .firstOrNull { candidate -> candidate.exists() && candidate.canExecute() }
         ?.absolutePath
