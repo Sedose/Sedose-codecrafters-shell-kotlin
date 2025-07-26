@@ -266,5 +266,10 @@
             <artifactId>kotlin-test-junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>3.30.4</version>
+        </dependency>
     </dependencies>
 </project>

@@ -6,6 +6,7 @@ import io.codecrafters.dto.ParsedCommand
 import io.codecrafters.external.ExternalProgramExecutor
 import io.codecrafters.parser.CommandParser
 import io.codecrafters.shared_mutable_state.ShellState
+import org.jline.reader.LineReader
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
 import java.io.FileOutputStream
@@ -16,6 +17,7 @@ import java.nio.file.Path
 @Component
 class ShellRunner(
     private val commandHandlerMap: Map<String, CommandHandler>,
+    private val lineReader: LineReader,
     private val externalProgramExecutor: ExternalProgramExecutor,
     private val commandParser: CommandParser,
     private val shellState: ShellState,
@@ -23,45 +25,41 @@ class ShellRunner(
 
     override fun run(vararg args: String) {
         while (true) {
-            val input = readUserInput() ?: break
-            if (input.isBlank()) continue
-
-            executeCommand(input)
+            val inputLine = lineReader.readLine("$ ") ?: break
+            if (inputLine.isBlank()) continue
+            executeCommand(inputLine)
         }
     }
 
-    private fun readUserInput(): String? {
-        print("$ ")
-        return readLine()?.trim()
-    }
+    private fun executeCommand(rawInput: String) {
+        val parsedCommand = commandParser.parse(rawInput)
+        val handler = commandHandlerMap[parsedCommand.commandName]
 
-    private fun executeCommand(input: String) {
-        val parsed = commandParser.parse(input)
-        val handler = commandHandlerMap[parsed.commandName]
-
-        if (parsed.stdoutRedirect != null || parsed.stderrRedirect != null) {
-            executeWithRedirection(handler, parsed)
+        if (parsedCommand.stdoutRedirect != null || parsedCommand.stderrRedirect != null) {
+            executeWithRedirection(handler, parsedCommand)
         } else {
-            executeDirectly(handler, parsed)
+            executeDirectly(handler, parsedCommand)
         }
     }
 
-    private fun executeDirectly(handler: CommandHandler?, parsed: ParsedCommand) {
-        handler?.handle(parsed.arguments)
-            ?: executeExternalCommand(parsed.commandName, parsed.arguments, null, null)
+    private fun executeDirectly(handler: CommandHandler?, parsedCommand: ParsedCommand) {
+        handler?.handle(parsedCommand.arguments)
+            ?: executeExternalCommand(
+                parsedCommand.commandName,
+                parsedCommand.arguments,
+                null,
+                null,
+            )
     }
 
-    private fun executeWithRedirection(
-        handler: CommandHandler?,
-        parsed: ParsedCommand,
-    ) {
-        val stdoutTarget = parsed.stdoutRedirect?.let(::prepareRedirectTarget)
-        val stderrTarget = parsed.stderrRedirect?.let(::prepareRedirectTarget)
+    private fun executeWithRedirection(handler: CommandHandler?, parsedCommand: ParsedCommand) {
+        val stdoutTarget = parsedCommand.stdoutRedirect?.let(::prepareRedirectTarget)
+        val stderrTarget = parsedCommand.stderrRedirect?.let(::prepareRedirectTarget)
 
         if (handler != null) {
-            executeBuiltinWithRedirection(handler, parsed.arguments, stdoutTarget, stderrTarget)
+            executeBuiltinWithRedirection(handler, parsedCommand.arguments, stdoutTarget, stderrTarget)
         } else {
-            executeExternalCommand(parsed.commandName, parsed.arguments, stdoutTarget, stderrTarget)
+            executeExternalCommand(parsedCommand.commandName, parsedCommand.arguments, stdoutTarget, stderrTarget)
         }
     }
 
@@ -80,16 +78,16 @@ class ShellRunner(
         val originalOut = System.out
         val originalErr = System.err
 
-        val newOut = stdoutTarget?.let { PrintStream(FileOutputStream(it.toFile())) }
-        val newErr = stderrTarget?.let { PrintStream(FileOutputStream(it.toFile())) }
+        val redirectedOut = stdoutTarget?.let { PrintStream(FileOutputStream(it.toFile())) }
+        val redirectedErr = stderrTarget?.let { PrintStream(FileOutputStream(it.toFile())) }
 
         try {
-            newOut?.let(System::setOut)
-            newErr?.let(System::setErr)
+            redirectedOut?.let(System::setOut)
+            redirectedErr?.let(System::setErr)
             handler.handle(arguments)
         } finally {
-            newOut?.close()
-            newErr?.close()
+            redirectedOut?.close()
+            redirectedErr?.close()
             System.setOut(originalOut)
             System.setErr(originalErr)
         }

@@ -1,5 +1,8 @@
 import pyperclip
 from pathlib import Path
 
-all_kotlin_code = "\n\n".join(file.read_text() for file in Path(".").rglob("*.kt"))
-pyperclip.copy(all_kotlin_code)
+if __name__ == "__main__":
+    root = Path(".")
+    pom = (root / "pom.xml").read_text() if (root / "pom.xml").exists() else ""
+    sources = "\n\n".join(f.read_text() for f in root.rglob("*.kt"))
+    pyperclip.copy(f"{pom}\n\n{sources}")
