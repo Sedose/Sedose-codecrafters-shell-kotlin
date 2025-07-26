@@ -4,9 +4,9 @@ import io.codecrafters.shared_mutable_state.ShellState
 import org.springframework.stereotype.Component
 
 @Component
-class PwdCommandHandler(
+class PwdBuiltinCommandHandler(
     private val shellState: ShellState,
-) : CommandHandler {
+) : BuiltinCommandHandler {
     override val commandName = "pwd"
 
     override fun handle(arguments: List<String>) {

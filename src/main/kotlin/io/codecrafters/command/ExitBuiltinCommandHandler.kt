@@ -4,9 +4,9 @@ import io.codecrafters.ExitExecutor
 import org.springframework.stereotype.Component
 
 @Component
-class ExitCommandHandler(
+class ExitBuiltinCommandHandler(
     private val exitExecutor: ExitExecutor,
-) : CommandHandler {
+) : BuiltinCommandHandler {
     override val commandName = "exit"
 
     override fun handle(arguments: List<String>) {

@@ -1,6 +1,6 @@
 package io.codecrafters.command
 
-interface CommandHandler {
+interface BuiltinCommandHandler {
     val commandName: String
 
     fun handle(arguments: List<String>)

@@ -1,22 +1,21 @@
 package io.codecrafters
 
-import io.codecrafters.command.CommandHandler
+import io.codecrafters.command.BuiltinCommandHandler
 import io.codecrafters.dto.ExternalProgramNotFound
-import io.codecrafters.dto.ParsedCommand
+import io.codecrafters.dto.ExternalProgramSuccess
 import io.codecrafters.external.ExternalProgramExecutor
 import io.codecrafters.parser.CommandParser
 import io.codecrafters.shared_mutable_state.ShellState
 import org.jline.reader.LineReader
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
-import java.io.FileOutputStream
 import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
 
 @Component
 class ShellRunner(
-    private val commandHandlerMap: Map<String, CommandHandler>,
+    private val builtinCommandHandlers: Map<String, BuiltinCommandHandler>,
     private val lineReader: LineReader,
     private val externalProgramExecutor: ExternalProgramExecutor,
     private val commandParser: CommandParser,
@@ -24,84 +23,55 @@ class ShellRunner(
 ) : CommandLineRunner {
 
     override fun run(vararg args: String) {
-        while (true) {
-            val inputLine = lineReader.readLine("$ ") ?: break
-            if (inputLine.isBlank()) continue
-            executeCommand(inputLine)
+        generateSequence { lineReader.readLine("$ ") }
+            .map(String::trim)
+            .filter(String::isNotBlank)
+            .forEach(::handleInput)
+    }
+
+    private fun handleInput(rawLine: String) {
+        val (commandName, commandArgs, stdoutRedirect, stderrRedirect) = commandParser.parse(rawLine)
+        val stdoutTarget = stdoutRedirect?.toPathWithin(shellState.currentDirectory)
+        val stderrTarget = stderrRedirect?.toPathWithin(shellState.currentDirectory)
+        if (builtinCommandHandlers.containsKey(commandName)) {
+            withRedirects(stdoutTarget, stderrTarget) {
+                builtinCommandHandlers.getValue(commandName)
+                    .handle(commandArgs)
+            }
+            return
+        }
+
+        when (externalProgramExecutor.execute(commandName, commandArgs, stdoutTarget, stderrTarget)) {
+            is ExternalProgramNotFound -> println("$commandName: not found")
+            is ExternalProgramSuccess -> { /* no op, it's fine */ }
         }
     }
 
-    private fun executeCommand(rawInput: String) {
-        val parsedCommand = commandParser.parse(rawInput)
-        val handler = commandHandlerMap[parsedCommand.commandName]
+    private fun String.toPathWithin(base: Path): Path =
+        base.resolve(this)
+            .normalize()
+            .also { Files.createDirectories(it.parent) }
 
-        if (parsedCommand.stdoutRedirect != null || parsedCommand.stderrRedirect != null) {
-            executeWithRedirection(handler, parsedCommand)
-        } else {
-            executeDirectly(handler, parsedCommand)
-        }
-    }
-
-    private fun executeDirectly(handler: CommandHandler?, parsedCommand: ParsedCommand) {
-        handler?.handle(parsedCommand.arguments)
-            ?: executeExternalCommand(
-                parsedCommand.commandName,
-                parsedCommand.arguments,
-                null,
-                null,
-            )
-    }
-
-    private fun executeWithRedirection(handler: CommandHandler?, parsedCommand: ParsedCommand) {
-        val stdoutTarget = parsedCommand.stdoutRedirect?.let(::prepareRedirectTarget)
-        val stderrTarget = parsedCommand.stderrRedirect?.let(::prepareRedirectTarget)
-
-        if (handler != null) {
-            executeBuiltinWithRedirection(handler, parsedCommand.arguments, stdoutTarget, stderrTarget)
-        } else {
-            executeExternalCommand(parsedCommand.commandName, parsedCommand.arguments, stdoutTarget, stderrTarget)
-        }
-    }
-
-    private fun prepareRedirectTarget(redirectPath: String): Path {
-        val target = shellState.currentDirectory.resolve(redirectPath).normalize()
-        Files.createDirectories(target.parent)
-        return target
-    }
-
-    private fun executeBuiltinWithRedirection(
-        handler: CommandHandler,
-        arguments: List<String>,
-        stdoutTarget: Path?,
-        stderrTarget: Path?,
+    private inline fun withRedirects(
+        stdout: Path?,
+        stderr: Path?,
+        action: () -> Unit,
     ) {
         val originalOut = System.out
         val originalErr = System.err
+        val redirectedOut = stdout?.let { PrintStream(Files.newOutputStream(it)) }
+        val redirectedErr = stderr?.let { PrintStream(Files.newOutputStream(it)) }
 
-        val redirectedOut = stdoutTarget?.let { PrintStream(FileOutputStream(it.toFile())) }
-        val redirectedErr = stderrTarget?.let { PrintStream(FileOutputStream(it.toFile())) }
+        redirectedOut?.let(System::setOut)
+        redirectedErr?.let(System::setErr)
 
         try {
-            redirectedOut?.let(System::setOut)
-            redirectedErr?.let(System::setErr)
-            handler.handle(arguments)
+            action()
         } finally {
             redirectedOut?.close()
             redirectedErr?.close()
             System.setOut(originalOut)
             System.setErr(originalErr)
-        }
-    }
-
-    private fun executeExternalCommand(
-        commandName: String,
-        arguments: List<String>,
-        stdoutRedirect: Path?,
-        stderrRedirect: Path?,
-    ) {
-        val result = externalProgramExecutor.execute(commandName, arguments, stdoutRedirect, stderrRedirect)
-        if (result is ExternalProgramNotFound) {
-            println("$commandName: not found")
         }
     }
 }

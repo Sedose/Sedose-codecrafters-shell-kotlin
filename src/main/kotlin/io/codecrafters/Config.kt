@@ -1,6 +1,6 @@
 package io.codecrafters
 
-import io.codecrafters.command.CommandHandler
+import io.codecrafters.command.BuiltinCommandHandler
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
 import org.jline.reader.impl.DefaultParser
@@ -14,8 +14,8 @@ import kotlin.system.exitProcess
 @Configuration
 class Config {
     @Bean
-    fun commandHandlerMap(commandHandlers: List<CommandHandler>): Map<String, CommandHandler> =
-        commandHandlers.associateBy { it.commandName }
+    fun commandHandlerMap(builtinCommandHandlers: List<BuiltinCommandHandler>): Map<String, BuiltinCommandHandler> =
+        builtinCommandHandlers.associateBy { it.commandName }
 
     @Bean
     @ConditionalOnMissingBean(ExitExecutor::class)

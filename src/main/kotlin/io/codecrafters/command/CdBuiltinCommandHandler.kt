@@ -7,9 +7,9 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 @Component
-class CdCommandHandler(
+class CdBuiltinCommandHandler(
     private val shellState: ShellState,
-) : CommandHandler {
+) : BuiltinCommandHandler {
     override val commandName = "cd"
 
     override fun handle(arguments: List<String>) {
