@@ -1,4 +1,4 @@
-[![progress-banner](https://backend.codecrafters.io/progress/shell/bfa4f3b9-8303-4f07-8475-56d00e168cef)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+[![progress-banner](https://backend.codecrafters.io/progress/shell/5b36f5ef-4016-45d9-b285-74e0bee1f4d3)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
 
 This is a starting point for Kotlin solutions to the
 ["Build Your Own Shell" Challenge](https://app.codecrafters.io/courses/shell/overview).
