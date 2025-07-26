@@ -29,6 +29,10 @@
             <id>mavenCentral</id>
             <url>https://repo1.maven.org/maven2/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencyManagement>
@@ -270,6 +274,11 @@
             <groupId>org.jline</groupId>
             <artifactId>jline</artifactId>
             <version>3.30.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.Sedose</groupId>
+            <artifactId>Kream</artifactId>
+            <version>v1.0.1</version>
         </dependency>
     </dependencies>
 </project>

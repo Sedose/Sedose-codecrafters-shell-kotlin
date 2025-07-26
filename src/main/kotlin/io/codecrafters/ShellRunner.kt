@@ -9,9 +9,9 @@ import io.codecrafters.shared_mutable_state.ShellState
 import org.jline.reader.LineReader
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
-import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
+import io.kream.withRedirects
 
 @Component
 class ShellRunner(
@@ -51,27 +51,4 @@ class ShellRunner(
         base.resolve(this)
             .normalize()
             .also { Files.createDirectories(it.parent) }
-
-    private inline fun withRedirects(
-        stdout: Path?,
-        stderr: Path?,
-        action: () -> Unit,
-    ) {
-        val originalOut = System.out
-        val originalErr = System.err
-        val redirectedOut = stdout?.let { PrintStream(Files.newOutputStream(it)) }
-        val redirectedErr = stderr?.let { PrintStream(Files.newOutputStream(it)) }
-
-        redirectedOut?.let(System::setOut)
-        redirectedErr?.let(System::setErr)
-
-        try {
-            action()
-        } finally {
-            redirectedOut?.close()
-            redirectedErr?.close()
-            System.setOut(originalOut)
-            System.setErr(originalErr)
-        }
-    }
 }
