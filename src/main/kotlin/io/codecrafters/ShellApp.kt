@@ -7,5 +7,7 @@ import org.springframework.boot.runApplication
 class ShellApp
 
 fun main(args: Array<String>) {
+    println("") // <– forces prompt to get flushed after startup
+    System.out.flush()
     runApplication<ShellApp>(*args)
 }

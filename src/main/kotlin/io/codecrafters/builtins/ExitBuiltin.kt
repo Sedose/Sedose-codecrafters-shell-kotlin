@@ -1,7 +1,6 @@
 package io.codecrafters.builtins
 
 import org.jline.terminal.Terminal
-import org.jline.terminal.TerminalBuilder
 import org.springframework.shell.ExitRequest
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
