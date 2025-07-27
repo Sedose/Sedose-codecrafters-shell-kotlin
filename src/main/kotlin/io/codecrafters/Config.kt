@@ -14,7 +14,7 @@ import kotlin.system.exitProcess
 @Configuration
 class Config {
     @Bean
-    fun commandHandlerMap(builtinCommandHandlers: List<BuiltinCommandHandler>): Map<String, BuiltinCommandHandler> =
+    fun builtinCommandHandlers(builtinCommandHandlers: List<BuiltinCommandHandler>): Map<String, BuiltinCommandHandler> =
         builtinCommandHandlers.associateBy { it.commandName }
 
     @Bean
