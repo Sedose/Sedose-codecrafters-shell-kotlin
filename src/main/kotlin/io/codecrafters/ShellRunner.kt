@@ -1,5 +1,6 @@
 package io.codecrafters
 
+import com.github.sedose.kream.withRedirects
 import io.codecrafters.command.BuiltinCommandHandler
 import io.codecrafters.dto.ExternalProgramNotFound
 import io.codecrafters.dto.ExternalProgramSuccess
@@ -11,7 +12,6 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
 import java.nio.file.Files
 import java.nio.file.Path
-import io.kream.withRedirects
 
 @Component
 class ShellRunner(
