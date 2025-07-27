@@ -2,13 +2,13 @@ package io.codecrafters.command.type
 
 import io.codecrafters.command.BuiltinCommandHandler
 import io.codecrafters.dto.ExecutableLookupResult
-import org.springframework.context.annotation.Lazy
+import org.apache.logging.log4j.util.Supplier
 import org.springframework.stereotype.Component
 
 @Component
 class TypeBuiltinCommandHandler(
     private val executableLocator: ExecutableLocator,
-    @Lazy private val builtinCommandHandlers: Map<String, BuiltinCommandHandler>,
+    private val builtinCommandHandlers: Supplier<Map<String, BuiltinCommandHandler>>,
 ) : BuiltinCommandHandler {
     override val commandName = "type"
 
@@ -18,7 +18,7 @@ class TypeBuiltinCommandHandler(
             println("type: missing operand")
             return
         }
-        val builtinCommandNames = builtinCommandHandlers.keys
+        val builtinCommandNames = builtinCommandHandlers.get().keys
         if (requestedCommand in builtinCommandNames) {
             println("$requestedCommand is a shell builtin")
             return
