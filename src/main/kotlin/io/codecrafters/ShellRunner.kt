@@ -7,7 +7,6 @@ import io.codecrafters.dto.ExternalProgramSuccess
 import io.codecrafters.external.ExternalProgramExecutor
 import io.codecrafters.parser.CommandParser
 import io.codecrafters.shared_mutable_state.ShellState
-import org.jline.reader.LineReader
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
 import java.nio.file.Files
@@ -16,17 +15,21 @@ import java.nio.file.Path
 @Component
 class ShellRunner(
     private val builtinCommandHandlers: Map<String, BuiltinCommandHandler>,
-    private val lineReader: LineReader,
     private val externalProgramExecutor: ExternalProgramExecutor,
     private val commandParser: CommandParser,
     private val shellState: ShellState,
 ) : CommandLineRunner {
 
     override fun run(vararg args: String) {
-        generateSequence { lineReader.readLine("$ ") }
-            .map(String::trim)
-            .filter(String::isNotBlank)
-            .forEach(::handleInput)
+        while (true) {
+            print("$ ")
+            System.out.flush()
+            val input = readLine() ?: break
+            val trimmed = input.trim()
+            if (trimmed.isNotBlank()) {
+                handleInput(trimmed)
+            }
+        }
     }
 
     private fun handleInput(rawLine: String) {

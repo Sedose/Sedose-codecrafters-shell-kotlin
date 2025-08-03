@@ -26,9 +26,16 @@ class Config {
 
     @Bean
     fun terminal(): Terminal =
-        TerminalBuilder.builder()
-            .system(true)
-            .build()
+        try {
+            TerminalBuilder.builder()
+                .system(true)
+                .build()
+        } catch (e: Exception) {
+            TerminalBuilder.builder()
+                .system(false)
+                .dumb(true)
+                .build()
+        }
 
     @Bean
     fun lineReader(terminal: Terminal): LineReader =
